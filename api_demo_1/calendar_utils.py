@@ -34,21 +34,21 @@ class calendar_iterators():
         year = int(date.strftime('%Y'))
         month = int(date.strftime('%m'))
         lastdate = calendar.monthrange(year=year, month=month)[1]
-        start = datetime.datetime(year, month, 1)
-        end = datetime.datetime(year, month, lastdate)
+        start = datetime.datetime(year, month, 1, tzinfo=pytz.UTC)
+        end = datetime.datetime(year, month, lastdate, tzinfo=pytz.UTC)
         return start, end
 
-    def lastmonthstartend(self, strdate):
-        date = datetime.datetime.strptime(str(strdate), '%Y-%m-%d').date()
+    def lastmonthstartend(self):
+        date = datetime.datetime.now(tz=pytz.UTC)
         day = int(date.strftime('%d'))
         month = int(date.strftime('%m'))
         year = int(date.strftime('%Y'))
-        end = self.get_daystart_time(date)
+        end = date
         if (month == 1):
-            start = datetime.datetime(year - 1, 12, day)
+            start = datetime.datetime(year=year - 1, month=12, day=day, tzinfo=pytz.UTC)
         else:
-            start = datetime.datetime(year, month - 1, day)
-        return start, end + datetime.timedelta(days=1)
+            start = datetime.datetime(year=year, month=month - 1, day=day, tzinfo=pytz.UTC)
+        return start, end
 
     def weekstartend(self, strdate):
         date = datetime.datetime.strptime(str(strdate), '%Y-%m-%d').date()

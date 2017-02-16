@@ -12,12 +12,30 @@ class Geospace(models.Model):
         db_table = 'geospaces'
 
     def __str__(self):
-        return str(self.latitude) +','+ str(self.longitude)
+        return str(self.latitude) + ',' + str(self.longitude)
 
 
-class Post(models.Model) :
+class Battalion(models.Model):
+    name = models.CharField(max_length=250, verbose_name='Name of Battalion')
+    geospace = models.OneToOneField('Geospace', on_delete=models.CASCADE)
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    slug = models.SlugField(null=True, editable=False)
+
+    class Meta:
+        db_table = 'battalions'
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args):
+        self.slug = slugify(self.name)
+        super(Battalion, self).save(*args)
+
+
+class Post(models.Model):
     name = models.CharField(max_length=250, verbose_name='name of post')
     geospace = models.OneToOneField('Geospace', on_delete=models.CASCADE)
+    battalion = models.ForeignKey('Battalion', related_name='posts', on_delete=models.CASCADE, null=True)
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4)
     slug = models.SlugField(null=True, editable=False)
 
@@ -31,7 +49,8 @@ class Post(models.Model) :
         self.slug = slugify(self.name)
         super(Post, self).save(*args)
 
-class Morcha(models.Model) :
+
+class Morcha(models.Model):
     name = models.CharField(max_length=250, verbose_name='name of morcha')
     geospace = models.OneToOneField('Geospace', on_delete=models.CASCADE)
     post = models.ForeignKey('Post', related_name='morchas', on_delete=models.CASCADE)
@@ -47,6 +66,7 @@ class Morcha(models.Model) :
     def save(self, *args):
         self.slug = slugify(self.name)
         super(Morcha, self).save(*args)
+
 
 class Intrusion(models.Model):
     morcha = models.ForeignKey('Morcha', on_delete=models.CASCADE, related_name='morcha')

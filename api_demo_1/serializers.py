@@ -12,12 +12,25 @@ class MorchaSerializer(serializers.ModelSerializer):
         model = Morcha
         fields = ('name', 'geospace', 'uuid')
 
-class PostSerializer(serializers.ModelSerializer):
+class PostMorchaSerializer(serializers.ModelSerializer):
     morchas = MorchaSerializer(many=True, read_only = True)
     geospace = GeospaceSerializer()
     class Meta:
         model = Post
-        fields = ('name', 'geospace', 'uuid', 'morchas',)
+        fields = ('name', 'geospace', 'uuid', 'morchas')
+
+class PostNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = ('name', 'uuid')
+
+class BattalionSerializer(serializers.ModelSerializer):
+    geospace = GeospaceSerializer()
+    posts = PostNameSerializer(many=True)
+
+    class Meta:
+        model = Morcha
+        fields = ('name', 'geospace', 'uuid', 'posts')
 
 class IntrusionSerializer(serializers.ModelSerializer):
     #morcha = MorchaSerializer()
@@ -33,15 +46,18 @@ class ReportDataSerializer(serializers.Serializer):
 class WeekReportSerializer(serializers.Serializer):
     day = serializers.DateField()
 
+class MorchaNameSerializer(serializers.ModelSerializer):
+    post = PostNameSerializer()
+    class Meta:
+        model = Morcha
+        fields = ('name', 'uuid', 'post')
+
 class LongestIntrusionSerializer(serializers.ModelSerializer):
-    morcha = MorchaSerializer()
+    morcha = MorchaNameSerializer()
     class Meta:
         model = Intrusion
         fields = ('detected_datetime', 'verified_datetime', 'neutralized_datetime',
-                  'non_human_intrusion_datetime', 'duration', 'morcha')
+                  'non_human_intrusion_datetime', 'duration', 'morcha', 'morcha')
 
-class MorchaNameSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Morcha
-        fields = ('name', 'uuid')
+
 
